@@ -1,5 +1,5 @@
 # This first line forces pip to use the CPU-only repository for PyTorch
- extra --index-url https://download.pytorch.org/whl/cpu
+#  extra --index-url https://download.pytorch.org/whl/cpu
 torch
 torchvision
 torchaudio
