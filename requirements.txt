@@ -1,16 +1,22 @@
---extra-index-url https://download.pytorch.org/whl/cpu
+# This first line forces pip to use the CPU-only repository for PyTorch
+ extra --index-url https://download.pytorch.org/whl/cpu
 torch
 torchvision
 torchaudio
 
-flask
-python-dotenv
-pypdf
-sentence-transformers
-pinecone-client
-langchain
-langchain-community
-langchain-pinecone
-langchain-groq
-langchain-huggingface
-gunicorn
+# Your application packages
+# gunicorn==21.2.0
+flask==3.1.0
+python-dotenv==1.1.0
+pypdf==5.6.1
+
+# LangChain and related packages
+langchain==0.3.26
+langchain-community==0.3.26
+langchain-pinecone==0.2.8
+langchain-groq==0.3.8
+langchain-huggingface  # Added for HuggingFaceEmbeddings
+
+# Other libraries
+pinecone-client==3.2.2
+sentence-transformers==4.1.0
