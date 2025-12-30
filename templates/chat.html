@@ -34,7 +34,11 @@
                     </svg>
                 </div>
                 <h2>Welcome to Medical Assistant</h2>
-                <p>I'm here to help answer your medical questions. Please note that I provide general information and should not replace professional medical advice.</p>
+                <p>
+                    I'm here to help answer your medical questions.
+                    Please note that I provide general information and
+                    should not replace professional medical advice.
+                </p>
             </div>
         </div>
 
@@ -45,12 +49,14 @@
                         <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                     </svg>
                 </button>
-                <input 
-                    type="text" 
-                    id="userInput" 
-                    placeholder="Type your medical question here..." 
+
+                <input
+                    type="text"
+                    id="userInput"
+                    placeholder="Type your medical question here..."
                     aria-label="Message input"
                 >
+
                 <button class="send-btn" id="sendBtn" aria-label="Send message">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -58,14 +64,12 @@
                     </svg>
                 </button>
             </div>
+
             <p class="disclaimer">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
-                Always consult with a healthcare professional for medical advice
+                ⚠️ Chat history is stored locally on your device
             </p>
+
+            <button onclick="clearChat()" style="margin-top:6px;">Clear Chat</button>
         </div>
     </div>
 
@@ -74,15 +78,31 @@
         const userInput = document.getElementById('userInput');
         const sendBtn = document.getElementById('sendBtn');
 
-        // This array will store the conversation history
-        let chatHistory = [];
+        /* ============================
+           LOAD CHAT HISTORY
+        ============================ */
+        let chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
 
-        // Event listeners
+        /* ============================
+           RESTORE HISTORY ON RELOAD
+        ============================ */
+        window.onload = () => {
+            if (chatHistory.length > 0) {
+                const welcomeMsg = document.querySelector('.welcome-message');
+                if (welcomeMsg) welcomeMsg.remove();
+
+                chatHistory.forEach((msg, index) => {
+                    addMessage(msg, index % 2 === 0 ? "user" : "bot");
+                });
+            }
+        };
+
+        /* ============================
+           EVENTS
+        ============================ */
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
+            if (e.key === 'Enter') sendMessage();
         });
 
         function sendMessage() {
@@ -90,77 +110,69 @@
             if (message === '') return;
 
             const welcomeMsg = document.querySelector('.welcome-message');
-            if (welcomeMsg) {
-                welcomeMsg.remove();
-            }
+            if (welcomeMsg) welcomeMsg.remove();
 
-            // Add user's message to the UI and history
+            // USER MESSAGE
             addMessage(message, 'user');
             chatHistory.push(message);
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
             userInput.value = '';
 
-            // Show a temporary "thinking" message from the bot
+            // THINKING
             addMessage('Thinking...', 'bot');
 
-            // --- Updated Fetch Request to send history ---
             const formData = new FormData();
             formData.append('msg', message);
-            
-            // Add the entire chat history to the form data
             chatHistory.forEach((entry) => {
                 formData.append('history[]', entry);
             });
 
             fetch('/get', {
                 method: 'POST',
-                body: formData, // Send form data which can handle arrays
+                body: formData
             })
             .then(response => response.text())
             .then(data => {
                 const thinkingMessage = chatContainer.lastChild;
-                if (thinkingMessage && thinkingMessage.querySelector('.message-bubble').innerText.startsWith('Thinking...')) {
-                    thinkingMessage.remove();
-                }
+                if (thinkingMessage) thinkingMessage.remove();
 
-                // Add the real bot response to the UI and history
                 addMessage(data, 'bot');
-                chatHistory.push(data); // Add bot's response to history
+                chatHistory.push(data);
+                localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
             })
-            .catch((error) => {
-                console.error('Error:', error);
+            .catch(() => {
                 const thinkingMessage = chatContainer.lastChild;
-                if (thinkingMessage && thinkingMessage.querySelector('.message-bubble').innerText.startsWith('Thinking...')) {
-                    thinkingMessage.remove();
-                }
-                addMessage('Sorry, something went wrong. Please try again.', 'bot');
+                if (thinkingMessage) thinkingMessage.remove();
+                addMessage('Sorry, something went wrong.', 'bot');
             });
         }
 
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}-message`;
-            
+
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
-            
-            if (sender === 'bot') {
-                avatar.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+            avatar.innerHTML = sender === 'bot'
+                ? `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                </svg>`;
-            } else {
-                avatar.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                   </svg>`
+                : `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
-                </svg>`;
-            }
+                   </svg>`;
 
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
-            bubble.innerText = text; // Use innerText to correctly display newlines and prevent HTML injection
+            bubble.innerText = text;
 
             const time = document.createElement('span');
             time.className = 'message-time';
-            time.textContent = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            time.textContent = new Date().toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(bubble);
@@ -170,6 +182,10 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        function clearChat() {
+            localStorage.removeItem("chatHistory");
+            chatContainer.innerHTML = "";
+        }
     </script>
 </body>
 </html>

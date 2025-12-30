@@ -1,14 +1,20 @@
 from flask import Flask, render_template, request
+from dotenv import load_dotenv
+import os
+
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
-from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains.history_aware_retriever import create_history_aware_retriever
+from langchain.chains.retrieval import create_retrieval_chain
+
 from langchain_groq import ChatGroq
 from langchain_pinecone import PineconeVectorStore
+
 from src.helper import download_embeddings
-import os
-from dotenv import load_dotenv
 from src.prompt import system_prompt
+
 
 # Initialize Flask app
 application = Flask(__name__)
