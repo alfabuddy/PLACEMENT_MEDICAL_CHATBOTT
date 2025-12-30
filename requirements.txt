@@ -1,13 +1,11 @@
-# This first line forces pip to use the CPU-only repository for PyTorch
-#  extra --index-url https://download.pytorch.org/whl/cpu
+# --extra-index-url https://download.pytorch.org/whl/cpu
 torch
 torchvision
 torchaudio
 
 # Your application packages
-# gunicorn==21.2.0
+gunicorn==21.2.0
 flask==3.1.0
-gunicorn
 python-dotenv==1.1.0
 pypdf==5.6.1
 
@@ -16,8 +14,6 @@ langchain==0.3.26
 langchain-community==0.3.26
 langchain-pinecone==0.2.8
 langchain-groq==0.3.8
-langchain-google-genai
-
 langchain-huggingface  # Added for HuggingFaceEmbeddings
 
 # Other libraries
