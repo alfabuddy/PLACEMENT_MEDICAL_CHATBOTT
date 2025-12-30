@@ -7,6 +7,7 @@ torchaudio
 # Your application packages
 # gunicorn==21.2.0
 flask==3.1.0
+gunicorn
 python-dotenv==1.1.0
 pypdf==5.6.1
 
