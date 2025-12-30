@@ -16,6 +16,8 @@ langchain==0.3.26
 langchain-community==0.3.26
 langchain-pinecone==0.2.8
 langchain-groq==0.3.8
+langchain-google-genai
+
 langchain-huggingface  # Added for HuggingFaceEmbeddings
 
 # Other libraries

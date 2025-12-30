@@ -13,7 +13,9 @@ from langchain_groq import ChatGroq
 from langchain_pinecone import PineconeVectorStore
 
 from src.prompt import system_prompt
-from src.helper import download_embeddings   # ✅ REQUIRED
+# from src.helper import download_embeddings   # ✅ REQUIRED
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
 
 # ---------------- Flask App ----------------
 application = Flask(__name__)
@@ -30,8 +32,11 @@ if not PINECONE_API_KEY or not GROQ_API_KEY:
 os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
 os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
-# ---------------- EMBEDDINGS (FIX) ----------------
-embeddings = download_embeddings()   # ✅ MUST EXIST
+# Lightweight embeddings for Render (NO memory issue)
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/embedding-001"
+)
+
 
 # ---------------- PINECONE ----------------
 docsearch = PineconeVectorStore.from_existing_index(
